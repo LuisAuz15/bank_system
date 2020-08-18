@@ -1,0 +1,31 @@
+{
+  "name": "bank_system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node serve.js",
+    "dev": "nodemon serve.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuisAuz15/bank_system.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LuisAuz15/bank_system/issues"
+  },
+  "homepage": "https://github.com/LuisAuz15/bank_system#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "pg": "^8.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
