@@ -144,6 +144,9 @@ function checkNotAuthenticated(req, res, next){
 }
 
 
+//Probablemente manejemos las inserciones en otras tablas aquí
+
+
 app.listen(PORT,()=>{
     console.log(`Server running on port ${PORT}`)
 })
