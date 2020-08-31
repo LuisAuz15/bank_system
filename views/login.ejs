@@ -9,10 +9,20 @@
 <body>
     <h1>Inicio de Sesión</h1>
 
-    <form action="/users/register" method="POST">
-        <div>
-            <input type="text" id="name" name="name" placeholder="Name" required>
-        </div>
+    <ul>
+        <% if(messages.succes_msg) { %>
+            <li><%= messages.succes_msg %></li>
+        <% } %>
+    </ul>
+
+    <ul>
+        <% if(messages.error ) { %>
+            <li><%= messages.error %></li>
+        <% } %>
+    </ul>
+
+    <form action="/users/login" method="POST">
+        
         <div>
             <input type="email" id="name" name="email" placeholder="Email" required>
         </div>
@@ -21,8 +31,8 @@
         </div>
        
         <div>
-            <input type="submit" value="Inicio de Sesión">
-        </div>
+            <input type="submit" value="Login">
+        </div> 
         <a href="/users/register">¿No tienes una cuenta? Registrate</a>
     </form>
 </body>

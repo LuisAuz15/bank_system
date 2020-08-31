@@ -1,12 +1,33 @@
-const express = require('express')
-const app = express()
-const {pool}=require('./dbConfig')
-const bcrypt=require('bcrypt')
+const express = require('express');
+const app = express();
+const {pool}=require('./dbConfig');
+const bcrypt=require('bcrypt');
+const session = require('express-session');
+const flash = require('express-flash');
+const passport=require('passport');
+const initializePassport = require('./passportConfig');
+const { request } = require('express');
+
+initializePassport(passport)
 
 const PORT = process.env.PORT || 777;
 
-app.set("view engine", "ejs"); 
 app.use(express.urlencoded({ extended:false }));
+app.set("view engine", "ejs"); 
+
+app.use(
+    session({
+    secret: 'secret',
+
+    resave: false,
+
+    saveUninitialized: false
+})
+)
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(flash());
 
 app.get('/', (req, res)=>{
     res.render('index')
@@ -21,11 +42,15 @@ app.get("/users/login", (req, res)=>{
 })
 
 app.get("/users/dashboard", (req, res)=>{
-    res.render("dashboard");
+    res.render("dashboard", 
+    {user: req.user.cliente_nombre}
+    );
 })
-
-app.post('/users/register', async (req, res)=>{
+   
+app.post("/users/register", async (req, res)=>{
     let {name, email, password, password2}=req.body;
+
+    let errors=[];
 
     console.log({
         name,
@@ -33,8 +58,6 @@ app.post('/users/register', async (req, res)=>{
         password,
         password2
     })
-
-    let errors=[];
 
     if(!name || !email || !password || !password2){
         errors.push({message: "Asegurese de ingresar todos los campos"})
@@ -55,7 +78,7 @@ app.post('/users/register', async (req, res)=>{
     }else{
         // La validacion pasó
         
-        let hashedPassword=await bcrypt.hash(password, 10)
+        hashedPassword=await bcrypt.hash(password, 10)
         console.log(hashedPassword)
 
         pool.query(
@@ -72,12 +95,33 @@ app.post('/users/register', async (req, res)=>{
                 if(results.rows.length>0){
                     errors.push({message: "El correo que ingresó ya está registrado"})
                     res.render("register", { errors });
-                }
+                }else{
+                    pool.query(
+                        `INSERT INTO cliente (cliente_nombre, cliente_correo, cliente_password)
+                        VALUES ($1, $2, $3)
+                        RETURNING cliente_id, cliente_password`, [name, email, hashedPassword], 
+                        (err, results)=>{
+                            if(err){
+                                throw err
+                            }
+                            console.log(results.rows);
+                            req.flash('succes_msg', "¡Listo! estás registrado, Ahora procede a iniciar sesión")
+                            res.redirect('/users/login')
+                        }
+                    )
+                } 
             }
         );
     }  
 }); 
 
+app.post(
+    '/users/login', 
+    passport.authenticate('local',{
+        successRedirect: "/users/dashboard",
+        failureRedirect: "/users/login",
+        failureFlash: true
+}))
 
 
 app.listen(PORT,()=>{
