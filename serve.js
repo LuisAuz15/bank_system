@@ -33,18 +33,24 @@ app.get('/', (req, res)=>{
     res.render('index')
 })
 
-app.get("/users/register", (req, res)=>{
+app.get("/users/register", checkAuthenticated, (req, res)=>{
     res.render("register");
 })
 
-app.get("/users/login", (req, res)=>{
+app.get("/users/login", checkAuthenticated, (req, res)=>{
     res.render("login");
 })
 
-app.get("/users/dashboard", (req, res)=>{
+app.get("/users/dashboard", checkNotAuthenticated, (req, res)=>{
     res.render("dashboard", 
     {user: req.user.cliente_nombre}
     );
+})
+
+app.get("/users/logout", (req, res)=>{
+    req.logOut();
+    req.flash('succes_msg', "You have logged out")
+    res.redirect('/')
 })
    
 app.post("/users/register", async (req, res)=>{
@@ -122,6 +128,20 @@ app.post(
         failureRedirect: "/users/login",
         failureFlash: true
 }))
+
+function checkAuthenticated(req,res,next){
+    if(req.isAuthenticated()){
+        return res.redirect('/users/dashboard');
+    }
+    next();
+}
+
+function checkNotAuthenticated(req, res, next){
+    if(req.isAuthenticated()){
+        return next();
+    }
+    res.redirect("/")
+}
 
 
 app.listen(PORT,()=>{
