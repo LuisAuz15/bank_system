@@ -51,6 +51,18 @@ app.get("/users/cuenta", (req, res)=>{
     res.render('cuenta')
 })
 
+app.get("/users/transferencias", (req, res)=>{
+    res.render('cuenta')
+})
+
+app.get("/users/depositos", (req, res)=>{
+    res.render('cuenta')
+})
+
+app.get("/users/pagos", (req, res)=>{
+    res.render('cuenta')
+})
+
 app.get("/users/logout", (req, res)=>{
     req.logOut();
     req.flash('succes_msg', "You have logged out")

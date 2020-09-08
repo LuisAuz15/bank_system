@@ -4,10 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" integrity="sha512-EZLkOqwILORob+p0BXZc+Vm3RgJBOe1Iq/0fiI7r/wJgzOFZMlsqTa29UEl6v6U6gsV4uIpsNZoV32YZqrCRCQ==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 </head>
-<body>
-    <h1>Registro</h1>
+<body class="bg-secondary">
+
+
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand " href="/">
+            <img src="https://image.flaticon.com/icons/png/512/57/57162.png" width="30" height="30"
+                class="d-inline-block align-top" alt="" loading="lazy">
+        </a>
+    </nav>
+
+    <h1 style="text-align: center; margin: 15px;">Registro</h1>
+
+
 
     <ul>
         <% if(typeof errors != 'undefined'){ %> <% errors.forEach(error=>{ %>
@@ -16,23 +28,44 @@
             
     </ul>
 
-    <form action="/users/register" method="POST">
-        <div>
-            <input type="text" id="name" name="name" placeholder="Name" required>
-        </div>
-        <div>
-            <input type="email" id="name" name="email" placeholder="Email" required>
-        </div>
-        <div>
-            <input type="password" id="password" name="password" placeholder="Password" required>
-        </div>
-        <div>
-            <input type="password" id="password2" name="password2" placeholder="Confirm password" required>
-        </div>
-        <div>
-            <input type="submit" value="Registro">
-        </div>
-        <a href="/users/login">¿Ya tienes una cuenta? Inicia sesión</a>
-    </form>
+    
+
+    <div class="d-flex justify-content-center" style="width: auto;" style="width: 80%; margin: 30px;">
+        <form  action="/users/register" method="POST">
+            <div class="form-group">
+                <label>Nombre</label>
+                <input class="form-control"  type="text" id="name" name="name" placeholder="Name" required>
+            </div>
+            <div class="form-group">
+                <label>Correo Electronico</label>
+                <input class="form-control"  type="email" id="name" name="email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input class="form-control"  type="password" id="password" name="password" placeholder="Password" required>
+            </div>
+            <div class="form-group">
+                <label>Confirme su contraseña</label>
+                <input class="form-control"  type="password" id="password2" name="password2" placeholder="Confirm password" required>
+            </div>
+            <div class="form-group">
+                <input class="btn btn-primary" class="form-group" type="submit" value="Registro">
+            </div>
+            <a class="text-light" href="/users/login">¿Ya tienes una cuenta? Inicia sesión</a>
+        </form>
+    </div>
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+    integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+    integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+    crossorigin="anonymous"></script>
 </body>
 </html>
