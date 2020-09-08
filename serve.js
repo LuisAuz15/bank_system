@@ -52,15 +52,15 @@ app.get("/users/cuenta", (req, res)=>{
 })
 
 app.get("/users/transferencias", (req, res)=>{
-    res.render('cuenta')
+    res.render('transferencias')
 })
 
 app.get("/users/depositos", (req, res)=>{
-    res.render('cuenta')
+    res.render('depositos')
 })
 
 app.get("/users/pagos", (req, res)=>{
-    res.render('cuenta')
+    res.render('pagos')
 })
 
 app.get("/users/logout", (req, res)=>{
