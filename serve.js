@@ -47,6 +47,10 @@ app.get("/users/dashboard", checkNotAuthenticated, (req, res)=>{
     );
 })
 
+app.get("/users/cuenta", (req, res)=>{
+    res.render('cuenta')
+})
+
 app.get("/users/logout", (req, res)=>{
     req.logOut();
     req.flash('succes_msg', "You have logged out")
