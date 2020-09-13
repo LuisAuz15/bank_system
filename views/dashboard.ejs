@@ -24,7 +24,7 @@
             aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="/users/dashboard">Menú</a>
+        <a class="navbar-brand" href="/users/dashboard">Inicio</a>
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
@@ -50,34 +50,45 @@
         </div>
     </nav>
 
-    <div>
-        <table class="table table-dark justify-content-center mx-auto" style="width: 80%; margin-top: 30px;">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Tipo de cuenta</th>
-                    <th scope="col">Saldo</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Corriente</td>
-                    <td>800</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Ahorros</td>
-                    <td>1400</td>
-                </tr>
-            </tbody>
-        </table>
+
+    <h4 class="text-light" style="text-align: center; margin-top: 20px;">
+        Cuentas
+    </h4>
+    <div >
+        <form action="" method="POST">
+            <table class="table table-dark justify-content-center mx-auto" style="width: 80%; margin-top: 30px;">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Tipo de cuenta</th>
+                        <th scope="col">Saldo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Corriente</td>
+                        <td id=corriente name=corriente>5000</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td>Ahorros</td>
+                        <td id=ahorros name=ahorros>1000</td>
+                    </tr>
+                </tbody> 
+            </table>
+            
+        <div class="form-group">
+            <input class="btn btn-primary" type="submit" value="Actualizar">
+
+        </div>
+        </form>
+
+
+        
     </div>
 
-    <footer>
-
-    </footer>
-
+    
 
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"

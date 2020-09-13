@@ -1,78 +1,143 @@
 const express = require('express');
 const app = express();
-const {pool}=require('./dbConfig');
-const bcrypt=require('bcrypt');
+const { pool } = require('./dbConfig');
+const bcrypt = require('bcrypt');
 const session = require('express-session');
 const flash = require('express-flash');
-const passport=require('passport');
+const passport = require('passport');
 const initializePassport = require('./passportConfig');
 const { request } = require('express');
+const router = express.Router();
+
+
+
 
 initializePassport(passport)
 
 const PORT = process.env.PORT || 777;
 
-app.use(express.urlencoded({ extended:false }));
-app.set("view engine", "ejs"); 
+app.use(express.urlencoded({ extended: false }));
+app.set("view engine", "ejs");
 
 app.use(
     session({
-    secret: 'secret',
+        secret: 'secret',
 
-    resave: false,
+        resave: false,
 
-    saveUninitialized: false
-})
+        saveUninitialized: false
+    })
 )
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(flash());
 
-app.get('/', (req, res)=>{
+app.get('/', (req, res) => {
     res.render('index')
 })
 
-app.get("/users/register", checkAuthenticated, (req, res)=>{
+app.get("/users/register", checkAuthenticated, (req, res) => {
     res.render("register");
 })
 
-app.get("/users/login", checkAuthenticated, (req, res)=>{
+app.get("/users/login", checkAuthenticated, (req, res) => {
     res.render("login");
 })
 
-app.get("/users/dashboard", checkNotAuthenticated, (req, res)=>{
-    res.render("dashboard", 
-    {user: req.user.cliente_nombre}
+app.get("/users/dashboard", checkNotAuthenticated, (req, res) => {
+    res.render("dashboard",
+        { user: req.user.cliente_nombre },
+        
+
     );
+    const saldo = pool.query('select cuenta_saldo from cuenta')
+    console.log(saldo)
+
+
+
 })
 
-app.get("/users/cuenta", (req, res)=>{
+
+/* app.post("/users/dashboard", (req, res) => {
+    pool.query(
+        `SELECT cuenta_saldo FROM cuenta
+        WHERE cliente_id= 1
+        `,
+        (err, results) => {
+            if (err) {
+                throw err;
+            }
+            console.log(results.rows);
+            res.send;
+
+        }
+    );
+})
+ */
+
+app.get("/users/cuenta", (req, res) => {
     res.render('cuenta')
 })
 
-app.get("/users/transferencias", (req, res)=>{
+app.get("/users/transferencias", (req, res) => {
     res.render('transferencias')
 })
 
-app.get("/users/depositos", (req, res)=>{
+app.get("/users/depositos", (req, res) => {
     res.render('depositos')
 })
 
-app.get("/users/pagos", (req, res)=>{
+app.post("/users/depositos", (req, res) => {
+    pool.query(
+        `SELECT cuenta_saldo FROM cuenta
+        WHERE cliente_id= $1
+        `,
+        [id],
+        (err, results) => {
+            if (err) {
+                throw err;
+            }
+            console.log(results.rows);
+
+            if (results.rows.length > 0) {
+                errors.push({ message: "El correo que ingresó ya está registrado" })
+                res.render("register", { errors });
+            } else {
+                pool.query(
+                    `INSERT INTO cliente (cliente_nombre, cliente_correo, cliente_password)
+                    VALUES ($1, $2, $3) 
+                    RETURNING cliente_id, cliente_password`, [name, email, hashedPassword],
+                    (err, results) => {
+                        if (err) {
+                            throw err
+                        }
+                        console.log(results.rows);
+                        req.flash('succes_msg', "¡Listo! estás registrado, Ahora procede a iniciar sesión")
+                        res.redirect('/users/login')
+                    }
+                )
+            }
+        }
+    );
+}
+)
+
+
+app.get("/users/pagos", (req, res) => {
     res.render('pagos')
 })
 
-app.get("/users/logout", (req, res)=>{
+app.get("/users/logout", (req, res) => {
     req.logOut();
     req.flash('succes_msg', "You have logged out")
     res.redirect('/')
 })
-   
-app.post("/users/register", async (req, res)=>{
-    let {name, email, password, password2}=req.body;
 
-    let errors=[];
+app.post("/users/register", async (req, res) => {
+    let { name, email, password, password2 } = req.body;
+
+    let errors = [];
 
     console.log({
         name,
@@ -81,49 +146,49 @@ app.post("/users/register", async (req, res)=>{
         password2
     })
 
-    if(!name || !email || !password || !password2){
-        errors.push({message: "Asegurese de ingresar todos los campos"})
+    if (!name || !email || !password || !password2) {
+        errors.push({ message: "Asegurese de ingresar todos los campos" })
 
     }
 
-    if(password.length<6){
-        errors.push({message: "La contraseña debe de tener 6 caracteres o más"})
+    if (password.length < 6) {
+        errors.push({ message: "La contraseña debe de tener 6 caracteres o más" })
 
     }
 
-    if(password!==password2){
-        errors.push({message: "Las contraseñas no coinciden"})
+    if (password !== password2) {
+        errors.push({ message: "Las contraseñas no coinciden" })
     }
 
-    if(errors.length>0){
-        res.render('register', {errors})
-    }else{
+    if (errors.length > 0) {
+        res.render('register', { errors })
+    } else {
         // La validacion pasó
-        
-        hashedPassword=await bcrypt.hash(password, 10)
+
+        hashedPassword = await bcrypt.hash(password, 10)
         console.log(hashedPassword)
 
         pool.query(
             `SELECT * FROM cliente
             WHERE cliente_correo= $1
-            `, 
-            [email], 
-            (err, results)=>{
-                if (err){
+            `,
+            [email],
+            (err, results) => {
+                if (err) {
                     throw err;
                 }
-                console.log(results.rows);  
+                console.log(results.rows);
 
-                if(results.rows.length>0){
-                    errors.push({message: "El correo que ingresó ya está registrado"})
+                if (results.rows.length > 0) {
+                    errors.push({ message: "El correo que ingresó ya está registrado" })
                     res.render("register", { errors });
-                }else{
+                } else {
                     pool.query(
                         `INSERT INTO cliente (cliente_nombre, cliente_correo, cliente_password)
-                        VALUES ($1, $2, $3)
-                        RETURNING cliente_id, cliente_password`, [name, email, hashedPassword], 
-                        (err, results)=>{
-                            if(err){
+                        VALUES ($1, $2, $3) 
+                        RETURNING cliente_id, cliente_password`, [name, email, hashedPassword],
+                        (err, results) => {
+                            if (err) {
                                 throw err
                             }
                             console.log(results.rows);
@@ -131,38 +196,73 @@ app.post("/users/register", async (req, res)=>{
                             res.redirect('/users/login')
                         }
                     )
-                } 
+                }
             }
         );
-    }  
-}); 
+    }
+});
 
 app.post(
-    '/users/login', 
-    passport.authenticate('local',{
+    '/users/login',
+    passport.authenticate('local', {
         successRedirect: "/users/dashboard",
         failureRedirect: "/users/login",
         failureFlash: true
-}))
+    }))
 
-function checkAuthenticated(req,res,next){
-    if(req.isAuthenticated()){
+
+
+function checkAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
         return res.redirect('/users/dashboard');
     }
     next();
 }
 
-function checkNotAuthenticated(req, res, next){
-    if(req.isAuthenticated()){
+function checkNotAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
         return next();
     }
     res.redirect("/")
 }
 
 
+
 //Probablemente manejemos las inserciones en otras tablas aquí
 
 
-app.listen(PORT,()=>{
+
+
+//app.use('/', productosRouter);
+
+
+app.post("/users/dashboard", async (req, res) => {
+    let { email, ahorros, corriente } = req.body;
+
+    let errors = [];
+
+    console.log({
+        ahorros,
+        corriente
+    })
+
+    pool.query(
+        `SELECT cuenta_saldo FROM cuenta
+        WHERE cliente_id= 1
+        `,
+        (err, results) => {
+            if (err) {
+                throw err;
+            }
+            console.log(results.rows);
+            res.send;
+            saldo=results
+        }
+    );
+    
+});
+
+
+app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })

@@ -12,6 +12,25 @@ const {Pool}=require("pg")
 
 // module.exports={pool};
 
+
+/* const config={
+    user: 'postgres',
+    host: '10.0.0.37',
+    port: 5432,
+    password: '1234',
+    database: 'banco'
+};
+
+const pool = new Pool(config);
+
+
+
+
+ */
+  
+
+
+
 const config={
     user: 'postgres',
     host: 'localhost',
@@ -21,4 +40,4 @@ const config={
 
 const pool = new Pool(config);
 
-module.exports={pool}
+module.exports={pool} 
