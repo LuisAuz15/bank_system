@@ -46,86 +46,273 @@ app.get("/users/login", checkAuthenticated, (req, res) => {
 })
 
 app.get("/users/dashboard", checkNotAuthenticated, (req, res) => {
-    res.render("dashboard",
-        { user: req.user.cliente_nombre },
-        
-
-    );
-    const saldo = pool.query('select cuenta_saldo from cuenta')
-    console.log(saldo)
 
 
-
-})
-
-
-/* app.post("/users/dashboard", (req, res) => {
-    pool.query(
-        `SELECT cuenta_saldo FROM cuenta
-        WHERE cliente_id= 1
-        `,
-        (err, results) => {
-            if (err) {
-                throw err;
-            }
-            console.log(results.rows);
-            res.send;
-
+    pool.query('select * from cuenta', (err, results) => {
+        if (err) {
+            res.render("dashboard")
         }
-    );
+        console.log(results.rows)
+        res.render("dashboard",
+            {
+                user: req.user.cliente_nombre,
+                cuentas: results.rows
+            }
+
+        );
+    })
+
+
+
 })
- */
+
 
 app.get("/users/cuenta", (req, res) => {
-    res.render('cuenta')
+    pool.query('select * from cuenta', (err, results) => {
+        if (err) {
+            res.render("cuenta")
+        }
+        console.log(results.rows)
+        const cuentas = results.rows
+        pool.query(`SELECT * from acciones where cuenta_id=$1`,
+            [cuentas.cuenta_id] 
+            , (err, results) => {
+                if (err) {
+                    console.log(err);
+                    res.render("cuenta",
+                        {
+                            acciones: results.rows,
+                        }
+
+                    );
+                }
+                res.render("cuenta",
+                    {
+                        cuentas,
+                        acciones: results.rows,
+                        cuentaelegida: cuentas.cuenta_id
+                    }
+
+                );
+
+            }
+
+        )
+
+    })
+
+})
+
+app.post("/users/cuenta", (req, res) => {
+    let { tipo } = req.body
+    pool.query(`SELECT * from acciones where cuenta_id=$1`,
+        [tipo]
+        , (err, results) => {
+            if (err) {
+                res.render("cuenta",
+                    {
+                        acciones: results.rows,
+
+                    }
+
+                );
+            }
+            const acciones = results.rows
+            pool.query('select * from cuenta', (err, results) => {
+                if (err) {
+                    res.render("cuenta")
+                }
+                console.log(tipo)
+                res.render("cuenta",
+                    {
+                        cuentas: results.rows,
+                        cuentaelegida: tipo,
+                        acciones
+                    }
+
+                );
+            })
+
+        }
+
+    )
+
+
 })
 
 app.get("/users/transferencias", (req, res) => {
-    res.render('transferencias')
+    pool.query('select * from cuenta', (err, results) => {
+        if (err) {
+            res.render("transferencias")
+        }
+        console.log(results.rows)
+        res.render("transferencias",
+            {
+                cuentas: results.rows,
+            }
+
+        );
+    })
 })
+
+app.post('/users/transferencias', (req, res)=>{
+    let {transferencia, beyond, beyond1 } = req.body
+    pool.query(`update cuenta set cuenta_saldo=cuenta_saldo-$1 where cuenta_id=$2`,
+        [transferencia, beyond]
+        , (err, results) => {
+            if (err) {
+                res.render("transferencias")
+            }
+            console.log(results.rows)
+            pool.query(`INSERT INTO acciones (accion_descripcion, cuenta_id,accion_valor) VALUES('Transferencia retiro', $1, $2)`,
+                [beyond, transferencia]
+                , (err, results) => {
+                    if (err) {
+                        res.render("transferencias",
+                            {
+                                cuentas: results.rows,
+
+                            }
+
+                        );
+                    }
+                    pool.query(`update cuenta set cuenta_saldo=cuenta_saldo+$1 where cuenta_id=$2`,
+                    [transferencia, beyond1]
+                    , (err, results) => {
+                        if (err) {
+                            res.render("transferencias")
+                        }
+                        console.log(results.rows)
+                        pool.query(`INSERT INTO acciones (accion_descripcion, cuenta_id,accion_valor) VALUES('Transferencia deposito', $1, $2)`,
+                            [beyond1, transferencia]
+                            , (err, results) => {
+                                if (err) {
+                                    res.render("transferencias",
+                                       
+            
+                                    );
+                                }
+                                
+                                res.redirect(301, "/users/transferencias");
+            
+                            }
+            
+                        )
+            
+                    })
+
+
+                }
+
+            )
+
+        })
+})
+
+
+
+
 
 app.get("/users/depositos", (req, res) => {
-    res.render('depositos')
+
+
+    pool.query('select * from cuenta', (err, results) => {
+        if (err) {
+            res.render("depositos")
+        }
+        console.log(results.rows)
+        res.render("depositos",
+            {
+                cuentas: results.rows,
+            }
+
+        );
+    })
+
 })
+ 
 
 app.post("/users/depositos", (req, res) => {
-    pool.query(
-        `SELECT cuenta_saldo FROM cuenta
-        WHERE cliente_id= $1
-        `,
-        [id],
-        (err, results) => {
-            if (err) {
-                throw err;
-            }
-            console.log(results.rows);
 
-            if (results.rows.length > 0) {
-                errors.push({ message: "El correo que ingresó ya está registrado" })
-                res.render("register", { errors });
-            } else {
-                pool.query(
-                    `INSERT INTO cliente (cliente_nombre, cliente_correo, cliente_password)
-                    VALUES ($1, $2, $3) 
-                    RETURNING cliente_id, cliente_password`, [name, email, hashedPassword],
-                    (err, results) => {
-                        if (err) {
-                            throw err
-                        }
-                        console.log(results.rows);
-                        req.flash('succes_msg', "¡Listo! estás registrado, Ahora procede a iniciar sesión")
-                        res.redirect('/users/login')
-                    }
-                )
+    let { beyond, forjo } = req.body
+    console.log(req.body)
+    pool.query(`update cuenta set cuenta_saldo=cuenta_saldo+$1 where cuenta_id=$2`,
+        [forjo, beyond]
+        , (err, results) => {
+            if (err) {
+                res.render("depositos")
             }
-        }
-    );
-}
-)
+            console.log(results.rows)
+            pool.query(`INSERT INTO acciones (accion_descripcion, cuenta_id,accion_valor) VALUES('Deposito', $1, $2)`,
+                [beyond, forjo]
+                , (err, results) => {
+                    if (err) {
+                        res.render("depositos",
+                            {
+                                cuentas: results.rows,
+
+                            }
+
+                        );
+                    }
+                    res.redirect(301, "/users/depositos")
+
+
+                }
+
+            )
+
+        })
+
+})
 
 
 app.get("/users/pagos", (req, res) => {
-    res.render('pagos')
+    pool.query('select * from cuenta', (err, results) => {
+        if (err) {
+            res.render("pagos")
+        }
+        console.log(results.rows)
+        res.render("pagos",
+            {
+                cuentas: results.rows,
+            }
+
+        );
+    })
+
+})
+
+app.post("/users/pagos", (req, res) => {
+
+    let { beyond, forjo } = req.body
+    console.log(req.body)
+    pool.query(`update cuenta set cuenta_saldo=cuenta_saldo-$1 where cuenta_id=$2`,
+        [forjo, beyond]
+        , (err, results) => {
+            if (err) {
+                res.render("pagos")
+            }
+            console.log(results.rows)
+            pool.query(`INSERT INTO acciones (accion_descripcion, cuenta_id,accion_valor) VALUES('Retiro', $1, $2)`,
+                [beyond, forjo]
+                , (err, results) => {
+                    if (err) {
+                        res.render("pagos",
+                            {
+                                cuentas: results.rows,
+
+                            }
+
+                        );
+                    }
+                    res.redirect(301, "/users/pagos");
+                }
+
+            )
+
+        })
+
 })
 
 app.get("/users/logout", (req, res) => {
@@ -233,34 +420,8 @@ function checkNotAuthenticated(req, res, next) {
 
 
 
-//app.use('/', productosRouter);
 
 
-app.post("/users/dashboard", async (req, res) => {
-    let { email, ahorros, corriente } = req.body;
-
-    let errors = [];
-
-    console.log({
-        ahorros,
-        corriente
-    })
-
-    pool.query(
-        `SELECT cuenta_saldo FROM cuenta
-        WHERE cliente_id= 1
-        `,
-        (err, results) => {
-            if (err) {
-                throw err;
-            }
-            console.log(results.rows);
-            res.send;
-            saldo=results
-        }
-    );
-    
-});
 
 
 app.listen(PORT, () => {

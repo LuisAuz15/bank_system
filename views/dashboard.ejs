@@ -11,7 +11,7 @@
 </head>
 
 <body class="bg-secondary ">
-   
+
     <nav class="navbar navbar-dark bg-dark">
         <a class="navbar-brand " href="#">
             <img src="https://image.flaticon.com/icons/png/512/57/57162.png" width="30" height="30"
@@ -38,7 +38,7 @@
                     <a class="nav-link" href="/users/depositos">Depositos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/users/pagos">Pagos</a>
+                    <a class="nav-link" href="/users/pagos">Retiro</a>
                 </li>
                 <li class="nav-item">
                     <a href="/users/logout" class="nav-link">Salir</a>
@@ -54,7 +54,7 @@
     <h4 class="text-light" style="text-align: center; margin-top: 20px;">
         Cuentas
     </h4>
-    <div >
+    <div>
         <form action="" method="POST">
             <table class="table table-dark justify-content-center mx-auto" style="width: 80%; margin-top: 30px;">
                 <thead>
@@ -65,30 +65,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Corriente</td>
-                        <td id=corriente name=corriente>5000</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Ahorros</td>
-                        <td id=ahorros name=ahorros>1000</td>
-                    </tr>
-                </tbody> 
-            </table>
-            
-        <div class="form-group">
-            <input class="btn btn-primary" type="submit" value="Actualizar">
 
-        </div>
+                    <% for (const cuenta of cuentas) { %>
+                    <tr>
+                        <th scope="row"><%= cuenta.cuenta_id %></th>
+                        <td><%= cuenta.cuenta_tipo %></td>
+                        <td id=corriente name=corriente> $ <%= cuenta.cuenta_saldo %></td>
+                        
+                    </tr>
+
+                    <% } %>
+
+               
+                </tbody>
+            </table>
+
+
         </form>
 
 
-        
-    </div>
 
-    
+    </div>
 
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"

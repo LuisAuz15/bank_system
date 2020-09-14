@@ -35,7 +35,7 @@
                     <a class="nav-link" href="/users/depositos">Depositos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/users/pagos">Pagos</a>
+                    <a class="nav-link" href="/users/pagos">Retiro</a>
                 </li>
                 <li class="nav-item">
                     <a href="/users/logout" class="nav-link">Salir</a>
@@ -56,14 +56,16 @@
         Transferencias entre mis cuentas
     </h4>
 
-    <div class="input-group justify-content-center mx-auto" style="width: 80%; text-align: center;  margin-top: 30px;">
+    <form method="POST" action="/users/transferencias" class="input-group justify-content-center mx-auto" style="width: 80%; text-align: center;  margin-top: 30px;">
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text">Cuenta de debito</span>
             </div>
-            <select class="form-control" id="sel1">
-                <option>Ahorros</option>
-                <option>Corriente</option>
+            <select name="beyond" class="form-control" id="sel1">
+                <% for (const cuenta of cuentas) { %>
+
+                <option value=<%= cuenta.cuenta_id %>><%= cuenta.cuenta_tipo %>  $<%= cuenta.cuenta_saldo %></option>
+                <% } %>
             </select>
 
         </div>
@@ -72,14 +74,16 @@
             <div class="input-group-prepend">
                 <span class="input-group-text">Cuenta de credito</span>
             </div>
-            <select class="form-control" id="sel1">
-                <option>Ahorros</option>
-                <option>Corriente</option>
+            <select name="beyond1" class="form-control" id="sel1">
+                <% for (const cuenta of cuentas) { %>
+
+                <option value=<%= cuenta.cuenta_id %>><%= cuenta.cuenta_tipo %>  $<%= cuenta.cuenta_saldo %></option>
+                <% } %>
             </select>
 
         </div>
 
-        <div class="input-group mb-3">
+        <!-- <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-default">Numero de cuenta</span>
             </div>
@@ -101,19 +105,20 @@
             </div>
             <input type="text" class="form-control" aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-default">
-        </div>
+        </div> -->
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-default">Monto</span>
             </div>
-            <input type="number" min="5" max="500" class="form-control" aria-label="Sizing example input"
+            <input name="transferencia" type="number" min="5" max="1000" class="form-control" aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-default">
         </div>
+        <button class="btn btn-primary" type="submit" id="button-addon2">Depositar</button>
 
 
 
-    </div>
+    </form>
 
 
 

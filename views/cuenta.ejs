@@ -33,7 +33,7 @@
                     <a class="nav-link" href="/users/depositos">Depositos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/users/pagos">Pagos</a>
+                    <a class="nav-link" href="/users/pagos">Retiro</a>
                 </li>
                 <li class="nav-item">
                     <a href="/users/logout" class="nav-link">Salir</a>
@@ -49,37 +49,54 @@
         Resumen de Movimientos
     </h4>
 
-    <div class="form-group justify-content-center mx-auto" style="width: 80%; margin-top: 30px;">
+    <form action="/users/cuenta" method="POST" class="form-group justify-content-center mx-auto" style="width: 80%; margin-top: 30px;">
         <label class="text-light" for="sel1">Seleccione una cuenta:</label>
-        <select class="form-control" id="sel1">
-          <option>Ahorros</option>
-          <option>Corriente</option>
+        <select name="tipo" class="form-control" id="sel1">
+
+            <% for (const cuenta of cuentas) { %>
+
+          <option value=<%= cuenta.cuenta_id %>><%= cuenta.cuenta_tipo %></option>
+          <% } %>
           
         </select>
-        <button class="btn btn-primary " type="button" id="button-addon2" style="margin-top: 20px;">Consultar</button>
-      </div>
+        <button class="btn btn-primary " type="submit" id="button-addon2" style="margin-top: 20px;">Consultar</button>
+    </form>
 
     <div>
         <table class="table table-dark justify-content-center mx-auto" style="width: 80%; margin-top: 30px;">
             
             <tbody>
+
+                
                 <tr>
                     <th colspan="4" scope="col">Movimientos</th>
                     <th scope="col">Saldo</th>
                 </tr>
+
+                <% for (const accion of acciones) { %>
                 <tr>
-                    <td colspan="4" scope="row">Depositos</td>
-                    <td scope="col">800</td>
+                    <td colspan="4" scope="row"><%= accion.accion_descripcion %></td>
+                    <td scope="col">$<%= accion.accion_valor %></td>
                 </tr>
-                <tr>
-                    <td  colspan="4" scope="row">Retiros</td>
-                    <td>1400</td>
-                </tr>
-                <tr>
-                    <th colspan="4" scope="col">Saldo actual</th>
-                    <th scope="col">1400</th>
-                </tr>
+                <% } %>
+
+               
+
+                <% for (const cuenta of cuentas) { %>
+
+                    <% if (cuenta.cuenta_id == cuentaelegida) { %>
+                        <tr>
+                            <th colspan="4" scope="col">Saldo actual</th>
+                            <td id=corriente name=corriente>$ <%= cuenta.cuenta_saldo %></td>
+                            
+                        </tr>
+                     
+                    <% } %>
+
+                <% } %>
+             
             </tbody>
+            
         </table>
         
     </div>
